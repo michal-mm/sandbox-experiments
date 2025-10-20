@@ -3,7 +3,9 @@ package collections;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -71,7 +73,7 @@ public class CollectionsPlayground {
         assertEquals(7, numbers.get(null));
         assertEquals(8, numbers.get(6));
 
-        for (Map.Entry<Integer, Integer> entry : numbers.entrySet()) {
+        for (Entry<Integer, Integer> entry : numbers.entrySet()) {
             IO.println(entry.getKey() + " -> " + entry.getValue());
         }
     }
@@ -89,7 +91,7 @@ public class CollectionsPlayground {
         assertEquals(0, numbers.get(null));
         assertEquals(6, numbers.get(6));
 
-        for (Map.Entry<Integer, Integer> entry : numbers.entrySet()) {
+        for (Entry<Integer, Integer> entry : numbers.entrySet()) {
             IO.println(entry.getKey() + " -> " + entry.getValue());
         }
     }
@@ -109,6 +111,27 @@ public class CollectionsPlayground {
         // adding non-null key&value works
         assertDoesNotThrow(() -> numbers.put(1,2));
         assertEquals(2, numbers.get(1));
+    }
+
+    @Test
+    void characterHistogram() {
+        List <Character> lChars = List.of('a', 'b', 'c', 'a', 'b', 'a');
+
+        var mapChar2Int = lChars.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                Function.identity(),
+                                Collectors.counting())
+                );
+
+        //noinspection rawtypes
+        for (Entry entry : mapChar2Int.entrySet()) {
+            IO.println(entry.getKey() + " - " + entry.getValue());
+        }
+
+        assertEquals(3, mapChar2Int.get('a'));
+        assertEquals(2, mapChar2Int.get('b'));
+        assertEquals(1, mapChar2Int.get('c'));
     }
 
     private static final Function<Collection<?>, Long> countNulls =
