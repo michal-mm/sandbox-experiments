@@ -111,7 +111,8 @@ public class StreamsPlayground {
                 "Belgium", List.of("Brussels"),
                 "Indonesia", List.of("Jakarta"),
                 "Italy", List.of("Rome", "Nappoli", "Palermo", "Bergamo"),
-                "Spain", List.of("Madrid", "Barcelona", "Sevilla", "Granada"));
+                "Spain", List.of("Madrid", "Barcelona", "Sevilla", "Granada"),
+                "DUPLICATES", List.of("Warsaw", "Berlin", "Paris"));
 
         // print countries and cities
         IO.println("-----------------");
@@ -144,6 +145,7 @@ public class StreamsPlayground {
 //                .forEach(IO::println);
         countries.values().stream()
                 .flatMap(List::stream)
+                .distinct()
                 .forEach(IO::println);
     }
 
@@ -175,6 +177,12 @@ public class StreamsPlayground {
                             if(integer % 2 == 0) {
                                 consumer.accept((double)integer * (1+percentage));
                             }
+//                            else {
+//                                consumer.accept(Double.valueOf(integer));
+//                                consumer.accept(Double.valueOf(integer * (1-percentage)));
+//                                consumer.accept(Double.valueOf(integer * (1+percentage)));
+//
+//                            }
                         })
                 .toList();
 
