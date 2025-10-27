@@ -2,6 +2,7 @@ package collections;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"StreamToLoop", "SimplifyStreamApiCallChains"})
 public class StreamsPlayground {
@@ -221,12 +222,47 @@ public class StreamsPlayground {
                 .forEach(IO::println);
     }
 
+    public static void splitStreamIntoBatchesAndProcess() {
+        List<String> items = List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
+        int batchSize = 4;
+        final List<String> batch = new ArrayList<>(batchSize);
+
+        items.forEach( str -> {
+                batch.add(str);
+                if (batch.size() >= batchSize) {
+                    doSomethingWithTheList(new ArrayList<>(batch));
+                    batch.clear();
+                }
+        });
+
+        if (!batch.isEmpty()) {
+            doSomethingWithTheList(batch);
+        }
+
+
+        final AtomicInteger counter = new AtomicInteger();
+        items.stream()
+                .collect(Collectors.groupingBy(str -> counter.getAndIncrement()/batchSize))
+                .values()
+                .forEach(StreamsPlayground::doSomethingWithTheList);
+
+    }
+
+    private static void doSomethingWithTheList(List<String> listOfStrings) {
+        var v = listOfStrings.stream()
+//                .collect(Collectors.joining(",", "[", "]"));
+                .reduce("", (e1, e2) -> e1 + "-" + e2);
+
+        IO.println(v);
+    }
+
     void main() {
         arraysAsListExperiments();
         simpleMapExample();
         moreComplexMapExample();
         mapAndFlatMapExample();
         mapMultiExamples();
+        splitStreamIntoBatchesAndProcess();
     }
 
     record NameAndLength(String name, Integer length){
