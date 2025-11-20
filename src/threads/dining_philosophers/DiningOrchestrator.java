@@ -16,7 +16,16 @@ public class DiningOrchestrator {
     }
 
     public void startTheParty() {
+        IO.println("Starting the party");
         philosophers.forEach(Philosopher::start);
+
+        philosophers.forEach(philosopher -> {
+            try {
+                philosopher.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         IO.println("Party is over");
     }
