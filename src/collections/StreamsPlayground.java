@@ -256,6 +256,16 @@ public class StreamsPlayground {
         IO.println(v);
     }
 
+    private static void experimentStreamPeek() {
+        IO.println("Experiment stream peek");
+        var list = List.of(1,2,3,4);
+        var c = list.stream()
+                .peek(IO::println)
+                .count();
+
+        IO.println("count of " + list + " is: " + c);
+    }
+
     void main() {
         arraysAsListExperiments();
         simpleMapExample();
@@ -263,6 +273,7 @@ public class StreamsPlayground {
         mapAndFlatMapExample();
         mapMultiExamples();
         splitStreamIntoBatchesAndProcess();
+        experimentStreamPeek();
     }
 
     record NameAndLength(String name, Integer length){
