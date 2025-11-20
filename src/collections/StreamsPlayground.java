@@ -260,10 +260,35 @@ public class StreamsPlayground {
         IO.println("Experiment stream peek");
         var list = List.of(1,2,3,4);
         var c = list.stream()
+                // this peek will not execute
                 .peek(IO::println)
                 .count();
 
         IO.println("count of " + list + " is: " + c);
+
+        var listStr = getListOfStrings();
+        var countStr = listStr.stream()
+                // this peek won't execute either
+                .peek(StreamsPlayground::myPrint)
+                // map has also no effect on count
+                .map(s -> {
+                    myPrint("map() @@:"+s);
+                    return "@@:"+s;
+                })
+                // with mapMulti we force the above peek and map to be executed
+                // beacuse mapmulti may change the content of the stream (the num of elems)
+                .mapMulti((s, a) ->
+                        List.of(s.toCharArray()).forEach(a::accept))
+                .count();
+        IO.println("count of " + listStr + " is: " + countStr);
+    }
+
+    private static List<String> getListOfStrings() {
+        return List.of("java", "is", "great", "!");
+    }
+
+    private static void myPrint(String message) {
+        IO.println("**: " + message);
     }
 
     void main() {
