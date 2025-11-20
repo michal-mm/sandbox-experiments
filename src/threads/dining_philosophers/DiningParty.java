@@ -20,7 +20,26 @@ public class DiningParty {
                 new Philosopher("Philosopher #5")
         );
 
-        var orchestrator = new DiningOrchestrator(philosophers, forks);
-        orchestrator.startTheParty();
+        initOrchestrator(philosophers, forks);
+
+        IO.println("Starting the party");
+        philosophers.forEach(Philosopher::start);
+
+        // let's wait until all philosophers are done
+        philosophers.forEach(philosopher -> {
+            try {
+                philosopher.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        IO.println("Party is over");
+
+        philosophers.forEach(p->IO.println(p.toString()));
+    }
+
+    private static void initOrchestrator(List<Philosopher> philosophers, List<Fork> forks) {
+        new DiningOrchestrator(philosophers, forks);
     }
 }
