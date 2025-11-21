@@ -27,4 +27,12 @@ public class Fork {
         this.usedBy = null;
         this.inUse = false;
     }
+
+    public String toString() {
+        if (inUse) {
+            return name + " used by: " + usedBy;
+        } else {
+            return name + " FREE";
+        }
+    }
 }

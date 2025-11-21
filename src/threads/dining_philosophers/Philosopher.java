@@ -6,6 +6,7 @@ import java.util.random.RandomGenerator;
 
 public class Philosopher extends Thread implements Runnable {
 
+    public static final int ANGRYNESS_LIMIT = 2;
     private final String name;
     private int eating;
     private int thinking;
@@ -20,6 +21,10 @@ public class Philosopher extends Thread implements Runnable {
     public Philosopher(String name) {
         Objects.requireNonNull(name);
         this.name = name;
+    }
+
+    public String name() {
+        return name;
     }
 
     public int hashCode() {
@@ -47,7 +52,7 @@ public class Philosopher extends Thread implements Runnable {
 
         waiting();
 
-        while ((eating > 0 || thinking > 0) && angry < 2) {
+        while ((eating > 0 || thinking > 0) && angry < ANGRYNESS_LIMIT) {
             if (eating > 0) {
                 if (diningOrchestrator.getCutlery(this)) {
                     eating();
@@ -55,7 +60,7 @@ public class Philosopher extends Thread implements Runnable {
                 } else {
                     waiting();
                     angry++;
-                    if (angry == 2)
+                    if (angry == ANGRYNESS_LIMIT)
                         IO.println(name + " SHAME! I'm starving, I'm leaving!");
                     continue;
                 }
@@ -73,8 +78,8 @@ public class Philosopher extends Thread implements Runnable {
 
     private void initLimitsForEatingAndThinking() {
         var rand = RandomGenerator.getDefault();
-        eating = rand.nextInt(5, 25);
-        thinking = rand.nextInt(5, 25);
+        eating = rand.nextInt(10, 21);
+        thinking = rand.nextInt(10, 21);
     }
 
     private String currentLimits() {

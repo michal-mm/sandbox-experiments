@@ -27,8 +27,11 @@ public class DiningOrchestrator {
     public boolean getCutlery(Philosopher p) {
         var idx = getIndices(p);
 
-        var firstLock = locks.get(idx.getFirst());
-        var secondLock = locks.get(idx.getLast());
+        Integer idxFirst = idx.getFirst();
+        var firstLock = locks.get(idxFirst);
+        Integer idxLast = idx.getLast();
+
+        var secondLock = locks.get(idxLast);
 
         try {
             var haveFirstLock = firstLock.tryLock(3, TimeUnit.SECONDS);
@@ -36,6 +39,8 @@ public class DiningOrchestrator {
             if (haveFirstLock) {
                 var haveSecondLock = secondLock.tryLock(3, TimeUnit.SECONDS);
                 if (haveSecondLock) {
+                    pickUpFork(idxFirst, p.name());
+                    pickUpFork(idxLast, p.name());
                     return true;
                 } else {
                     firstLock.unlock();
@@ -45,6 +50,7 @@ public class DiningOrchestrator {
                 return false;
             }
         } catch (InterruptedException e) {
+
             firstLock.unlock();
             secondLock.unlock();
             throw new RuntimeException(e);
@@ -53,7 +59,22 @@ public class DiningOrchestrator {
 
     public void giveBackCutlery(Philosopher p) {
         var ids = getIndices(p);
-        ids.forEach(i -> locks.get(i).unlock());
+        ids.forEach(i -> {
+            putDownFork(i);
+            locks.get(i).unlock();
+        });
+    }
+
+    private void pickUpFork(int forkIdx, String philosopherName) {
+        var fork = forks.get(forkIdx);
+        fork.pickUp(philosopherName);
+        IO.println(fork);
+    }
+
+    private void putDownFork(int forkIdx) {
+        var fork = forks.get(forkIdx);
+        fork.putDown();
+        IO.println(fork);
     }
 
     private void passOrchestratorReferenceToPhilosophers() {
