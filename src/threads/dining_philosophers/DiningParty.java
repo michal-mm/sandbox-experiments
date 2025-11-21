@@ -36,7 +36,7 @@ public class DiningParty {
 
         IO.println("Party is over");
 
-        philosophers.forEach(p->IO.println(p.toString()));
+        philosophers.forEach(p->IO.println(p.showDetails()));
     }
 
     private static void initOrchestrator(List<Philosopher> philosophers, List<Fork> forks) {

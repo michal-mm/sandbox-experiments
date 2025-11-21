@@ -14,9 +14,6 @@ public class Philosopher extends Thread implements Runnable {
 
     private DiningOrchestrator diningOrchestrator;
 
-    private Philosopher() {
-        this.name = "Philosopher Rand#" + RandomGenerator.getDefault().nextInt(1000,2000);
-    }
 
     public Philosopher(String name) {
         Objects.requireNonNull(name);
@@ -53,18 +50,14 @@ public class Philosopher extends Thread implements Runnable {
         waiting();
 
         while ((eating > 0 || thinking > 0) && angry < ANGRYNESS_LIMIT) {
-            if (eating > 0) {
-                if (diningOrchestrator.getCutlery(this)) {
-                    eating();
-                    diningOrchestrator.giveBackCutlery(this);
-                } else {
+            if (eating > 0 && !diningOrchestrator.tryEat(this, this::performEating)) {
                     waiting();
                     angry++;
                     if (angry == ANGRYNESS_LIMIT)
                         IO.println(name + " SHAME! I'm starving, I'm leaving!");
                     continue;
-                }
             }
+
             thinking();
             IO.println(name + " " + currentLimits());
         }
@@ -72,7 +65,7 @@ public class Philosopher extends Thread implements Runnable {
         IO.println(name + " leaves the party, " + currentLimits());
     }
 
-    public String toString() {
+    public String showDetails() {
         return "[" + name + " " + currentLimits() + "]";
     }
 
@@ -95,8 +88,13 @@ public class Philosopher extends Thread implements Runnable {
             thinking = thinking < d ? 0 : thinking - d;
             Thread.sleep(Duration.ofSeconds(d));
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
+    }
+
+    private void performEating() {
+        eating();
     }
 
     private void eating() {
@@ -108,6 +106,7 @@ public class Philosopher extends Thread implements Runnable {
             eating = eating < d ? 0 : eating - d;
             Thread.sleep(Duration.ofSeconds(d));
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
     }
@@ -120,6 +119,7 @@ public class Philosopher extends Thread implements Runnable {
             IO.println(name + " will wait for " + d + " seconds...");
             Thread.sleep(Duration.ofSeconds(d));
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
     }

@@ -24,45 +24,44 @@ public class DiningOrchestrator {
         initLocks();
     }
 
-    public boolean getCutlery(Philosopher p) {
-        var idx = getIndices(p);
+    public boolean tryEat(Philosopher p , Runnable eatAction) {
+        var indices = getIndices(p);
+        Integer idxFirst = indices.getFirst();
+        Integer idxLast = indices.getLast();
 
-        Integer idxFirst = idx.getFirst();
-        var firstLock = locks.get(idxFirst);
-        Integer idxLast = idx.getLast();
-
-        var secondLock = locks.get(idxLast);
+        ReentrantLock firstLock = locks.get(idxFirst);
+        ReentrantLock secondLock = locks.get(idxLast);
 
         try {
-            var haveFirstLock = firstLock.tryLock(3, TimeUnit.SECONDS);
-
-            if (haveFirstLock) {
-                var haveSecondLock = secondLock.tryLock(3, TimeUnit.SECONDS);
-                if (haveSecondLock) {
-                    pickUpFork(idxFirst, p.name());
-                    pickUpFork(idxLast, p.name());
-                    return true;
-                } else {
-                    firstLock.unlock();
-                    return false;
-                }
-            } else {
+            if (!firstLock.tryLock(3, TimeUnit.SECONDS)) {
                 return false;
             }
+
+            try {
+                if (!secondLock.tryLock(3, TimeUnit.SECONDS)) {
+                    return false;
+                }
+
+                try {
+                    pickUpFork(idxFirst, p.name());
+                    pickUpFork(idxLast, p.name());
+
+                    eatAction.run();
+
+                    putDownFork(idxFirst);
+                    putDownFork(idxLast);
+
+                    return true;
+                } finally {
+                    secondLock.unlock();
+                }
+            } finally {
+                firstLock.unlock();
+            }
         } catch (InterruptedException e) {
-
-            firstLock.unlock();
-            secondLock.unlock();
-            throw new RuntimeException(e);
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while trying to acquire cutlery", e);
         }
-    }
-
-    public void giveBackCutlery(Philosopher p) {
-        var ids = getIndices(p);
-        ids.forEach(i -> {
-            putDownFork(i);
-            locks.get(i).unlock();
-        });
     }
 
     private void pickUpFork(int forkIdx, String philosopherName) {
