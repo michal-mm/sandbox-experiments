@@ -2,9 +2,10 @@ package threads.dining_philosophers;
 
 import java.time.Duration;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 import java.util.random.RandomGenerator;
 
-public class Philosopher extends Thread implements Runnable {
+public class Philosopher extends Thread implements Runnable, Callable<String> {
 
     public static final int ANGRYNESS_LIMIT = 2;
     private final String name;
@@ -43,6 +44,21 @@ public class Philosopher extends Thread implements Runnable {
 
     @Override
     public void run() {
+        philosopherTakesActions();
+    }
+
+    @Override
+    public String call(){
+        philosopherTakesActions();
+
+        return showDetails();
+    }
+
+    public String showDetails() {
+        return "[" + name + " " + currentLimits() + "]";
+    }
+
+    private void philosopherTakesActions() {
         Objects.requireNonNull(diningOrchestrator);
         initLimitsForEatingAndThinking();
         IO.println(name + " takes a seat, " + currentLimits());
@@ -63,10 +79,6 @@ public class Philosopher extends Thread implements Runnable {
         }
 
         IO.println(name + " leaves the party, " + currentLimits());
-    }
-
-    public String showDetails() {
-        return "[" + name + " " + currentLimits() + "]";
     }
 
     private void initLimitsForEatingAndThinking() {
@@ -123,4 +135,6 @@ public class Philosopher extends Thread implements Runnable {
             throw new RuntimeException(e);
         }
     }
+
+
 }

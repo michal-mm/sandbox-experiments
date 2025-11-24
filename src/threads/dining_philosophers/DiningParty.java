@@ -39,7 +39,7 @@ public class DiningParty {
         philosophers.forEach(p->IO.println(p.showDetails()));
     }
 
-    private static void initOrchestrator(List<Philosopher> philosophers, List<Fork> forks) {
+    public static void initOrchestrator(List<Philosopher> philosophers, List<Fork> forks) {
         new DiningOrchestrator(philosophers, forks);
     }
 }
