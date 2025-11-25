@@ -23,10 +23,12 @@ public class DiningParty {
         initOrchestrator(philosophers, forks);
 
         IO.println("Starting the party");
-        philosophers.forEach(Philosopher::start);
+        var philosophersThreads = philosophers.stream()
+                .map(p -> Thread.ofPlatform().start(p))
+                .toList();
 
         // let's wait until all philosophers are done
-        philosophers.forEach(philosopher -> {
+        philosophersThreads.forEach(philosopher -> {
             try {
                 philosopher.join();
             } catch (InterruptedException e) {
@@ -37,6 +39,11 @@ public class DiningParty {
         IO.println("Party is over");
 
         philosophers.forEach(p->IO.println(p.showDetails()));
+        for (int i=0; i<philosophers.size(); i++) {
+            IO.println(philosophers.get(i).showDetails() + " - " +
+                    philosophersThreads.get(i).getName() +
+                    " is Virtual: " + philosophersThreads.get(i).isVirtual());
+        }
     }
 
     public static void initOrchestrator(List<Philosopher> philosophers, List<Fork> forks) {

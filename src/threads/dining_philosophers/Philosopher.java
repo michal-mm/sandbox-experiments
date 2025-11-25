@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.random.RandomGenerator;
 
-public class Philosopher extends Thread implements Runnable, Callable<String> {
+public class Philosopher /* extends Thread */ implements Runnable, Callable<String> {
 
     public static final int ANGRYNESS_LIMIT = 2;
     private final String name;
