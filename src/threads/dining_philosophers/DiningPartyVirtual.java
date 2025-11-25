@@ -25,5 +25,23 @@ public class DiningPartyVirtual {
         initOrchestrator(philosophers, forks);
 
         IO.println("Starting the party with Virtual Threads");
+
+        // start the threads (philosophers and let them eat and meditate)
+        var philosophersThreads = philosophers.stream()
+                .map(Thread::startVirtualThread)
+                .toList();
+
+        // let's wait until all philosophers are done
+        philosophersThreads.forEach(philosopher -> {
+            try {
+                philosopher.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        IO.println("Party is over");
+
+        philosophers.forEach(p->IO.println(p.showDetails()));
     }
 }
