@@ -6,7 +6,7 @@ import java.util.random.RandomGenerator;
 
 public class CompletableFutureExperiments {
 
-    void main() throws InterruptedException, ExecutionException {
+    void main() throws InterruptedException {
         try (var executor = Executors.newSingleThreadExecutor()) {
             var future = executor.submit(getRandInt());
 
@@ -20,7 +20,6 @@ public class CompletableFutureExperiments {
             var res = future.resultNow();
             IO.println("future result " + res);
             executor.shutdown();
-
         }
 
     }
