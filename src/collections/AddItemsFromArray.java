@@ -3,18 +3,54 @@ package collections;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AddItemsFromArray {
 
     long addItems(int[] items) {
-        var result = Arrays.stream(items)
+        return Arrays.stream(items)
                 .mapToLong(i->i)
                 .sum();
+    }
+
+    long addItemsParallel(int[] items) {
+        return Arrays.stream(items)
+                .parallel()
+                .mapToLong(i -> i)
+                .sum();
+    }
+
+    long addItemsForLoop(int[] items) {
+        long result = 0L;
+        for(var item : items) {
+            result += item;
+        }
 
         return result;
     }
+
+    void main() {
+        var intArray = IntStream.range(0, 1_000_000_000)
+                .toArray();
+
+        var startReg = System.currentTimeMillis();
+        var resultReg = addItems(intArray);
+        var finishReg = System.currentTimeMillis();
+        IO.println("Regular - Execution time: " + (finishReg-startReg) + "  result=" + resultReg);
+
+        var startP = System.currentTimeMillis();
+        var resultP = addItemsParallel(intArray);
+        var finishP = System.currentTimeMillis();
+        IO.println("Parallel - Execution time: " + (finishP-startP) + "  result=" + resultP);
+
+        var startF = System.currentTimeMillis();
+        var resultF = addItemsForLoop(intArray);
+        var finishF = System.currentTimeMillis();
+        IO.println("For Loop - Execution time: " + (finishF-startF) + "  result=" + resultF);
+    }
+
 
     @Test
     void simpleAddTest() {
@@ -24,7 +60,7 @@ public class AddItemsFromArray {
 
     @Test
     void testMaxInt() {
-        int tab [] = {1, Integer.MAX_VALUE};
+        int[] tab = {1, Integer.MAX_VALUE};
         long result = addItems(tab);
         try {
             int intFromLong = Math.toIntExact(result);
