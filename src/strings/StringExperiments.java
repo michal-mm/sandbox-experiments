@@ -1,4 +1,4 @@
-package unclassified;
+package strings;
 
 public class StringExperiments {
 

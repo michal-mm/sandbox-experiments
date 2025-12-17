@@ -1,4 +1,4 @@
-package unclassified;
+package strings;
 
 import java.io.IOException;
 import java.nio.file.Files;
