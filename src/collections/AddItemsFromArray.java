@@ -2,6 +2,8 @@ package collections;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
@@ -35,20 +37,20 @@ public class AddItemsFromArray {
         var intArray = IntStream.range(0, 1_000_000_000)
                 .toArray();
 
-        var startReg = System.currentTimeMillis();
+        var startReg = Instant.now();
         var resultReg = addItems(intArray);
-        var finishReg = System.currentTimeMillis();
-        IO.println("Regular - Execution time: " + (finishReg-startReg) + "  result=" + resultReg);
+        var finishReg = Instant.now();
+        IO.println("Regular - Execution time: " + Duration.between(startReg, finishReg).toMillis() + "  result=" + resultReg);
 
-        var startP = System.currentTimeMillis();
+        var startP = Instant.now();
         var resultP = addItemsParallel(intArray);
-        var finishP = System.currentTimeMillis();
-        IO.println("Parallel - Execution time: " + (finishP-startP) + "  result=" + resultP);
+        var finishP = Instant.now();
+        IO.println("Parallel - Execution time: " + Duration.between(startP, finishP).toMillis() + "  result=" + resultP);
 
-        var startF = System.currentTimeMillis();
+        var startF = Instant.now();
         var resultF = addItemsForLoop(intArray);
-        var finishF = System.currentTimeMillis();
-        IO.println("For Loop - Execution time: " + (finishF-startF) + "  result=" + resultF);
+        var finishF = Instant.now();
+        IO.println("For Loop - Execution time: " + Duration.between(startF, finishF).toMillis() + "  result=" + resultF);
     }
 
 
