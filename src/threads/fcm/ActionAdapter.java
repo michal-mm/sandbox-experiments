@@ -3,7 +3,7 @@ package threads.fcm;
 import java.util.List;
 import java.util.Set;
 
-public class FcmAdapter {
+public class ActionAdapter {
 
     private void performAction(List<String> actions, Set<String> params){
         for (var action : actions){
