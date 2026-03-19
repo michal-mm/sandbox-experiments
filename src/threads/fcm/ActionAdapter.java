@@ -15,12 +15,23 @@ public class ActionAdapter {
     private void performAction(List<String> actions, List<String> params){
         for (var action : actions){
             var sleepTime = Duration.ofSeconds(RandomGenerator.getDefault().nextInt(3, 10));
-            if (RandomGenerator.getDefault().nextBoolean()) {
-                executeAction(action, params.get(RandomGenerator.getDefault().nextInt(params.size())), sleepTime, this::successfulActionWithRandomSleep);
+            if (randBoolean25vs75()) {
+                executeAction(action,
+                        params.get(RandomGenerator.getDefault().nextInt(params.size())),
+                        sleepTime,
+                        this::successfulActionWithRandomSleep);
             } else {
-                executeAction(action, params.get(RandomGenerator.getDefault().nextInt(params.size())), sleepTime, this::randomFailAction);
+                executeAction(action,
+                        params.get(RandomGenerator.getDefault().nextInt(params.size())),
+                        sleepTime,
+                        this::randomFailAction);
             }
         }
+    }
+
+    private static boolean randBoolean25vs75() {
+        return RandomGenerator.getDefault().nextBoolean()
+                || RandomGenerator.getDefault().nextBoolean();
     }
 
     private String executeAction(String action, String response, Duration sleepTimeOfSeconds, ActionOperator op){
