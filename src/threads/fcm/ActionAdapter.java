@@ -62,6 +62,8 @@ public class ActionAdapter {
     private void executeSleep(Duration sleepTimeOfSeconds) {
         try {
             Thread.sleep(sleepTimeOfSeconds);
-        } catch (InterruptedException e) {}
+        } catch (InterruptedException e) {
+            IO.println("Interrupted: " + e.getMessage());
+        }
     }
 }
