@@ -38,13 +38,30 @@ public class ActionAdapter {
         return op.apply(action, response, sleepTimeOfSeconds);
     }
 
-    private String successfulActionWithRandomSleep(String action, String param, Duration sleepTimeOfSeconds) {
-        // TODO
-        return null;
+    private String successfulActionWithRandomSleep(String action, String response, Duration sleepTimeOfSeconds) {
+        IO.println("START: " + action + " SLEEP TIME: " + sleepTimeOfSeconds);
+        executeSleep(sleepTimeOfSeconds);
+        IO.println("END: " + action + " RETURNING: " + response);
+
+        return response;
     }
 
-    private String randomFailAction(String action, String param, Duration sleepTimeOfSeconds) {
-        // TODO
-        return null;
+    private String randomFailAction(String action, String response, Duration sleepTimeOfSeconds) {
+        IO.println("START: " + action + " SLEEP TIME: " + sleepTimeOfSeconds);
+        executeSleep(sleepTimeOfSeconds);
+
+        if (RandomGenerator.getDefault().nextInt(100) % 3 == 0) {
+            IO.println("END: " + action + " ERROR");
+            return "ERROR";
+        } else {
+            IO.println("END: " + action + " RETURNING: " + response);
+            return response;
+        }
+    }
+
+    private void executeSleep(Duration sleepTimeOfSeconds) {
+        try {
+            Thread.sleep(sleepTimeOfSeconds);
+        } catch (InterruptedException e) {}
     }
 }
