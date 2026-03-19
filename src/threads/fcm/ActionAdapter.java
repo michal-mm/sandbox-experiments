@@ -2,7 +2,6 @@ package threads.fcm;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Set;
 import java.util.random.RandomGenerator;
 
 public class ActionAdapter {
