@@ -8,56 +8,69 @@ import java.util.concurrent.Executors;
 import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 
+public class ActionAdapter /*implements ActionAdapterPort */{
 
-public class ActionAdapter implements ActionAdapterPort {
+    private final LatencyInterceptor interceptor;
 
+    public ActionAdapter() {
+        this.interceptor = new LatencyInterceptor(new LatencyRecorder());
+    }
 
-    public List<String> performAction(List<String> actions, List<String> params){
+    public ActionAdapter(LatencyInterceptor interceptor) {
+        this.interceptor = interceptor;
+    }
+
+//    @Override
+    public List<String> performAction(List<String> actions, List<String> params) {
         var result = new ArrayList<String>();
+        interceptor.startBatch();
 
-        for (var action : actions){
+        for (var action : actions) {
             var sleepTime = Duration.ofSeconds(RandomGenerator.getDefault().nextInt(3, 10));
-            if (randBoolean25vs75()) {
-                result.add(executeAction(action,
-                        params.get(RandomGenerator.getDefault().nextInt(params.size())),
-                        sleepTime,
-                        this::successfulActionWithRandomSleep));
-            } else {
-                result.add(executeAction(action,
-                        params.get(RandomGenerator.getDefault().nextInt(params.size())),
-                        sleepTime,
-                        this::randomFailAction));
-            }
+            var param = params.get(RandomGenerator.getDefault().nextInt(params.size()));
+            ActionOperator op = randBoolean25vs75()
+                    ? this::successfulActionWithRandomSleep
+                    : this::randomFailAction;
+
+            result.add(interceptor.recordLatency(action, () -> executeAction(action, param, sleepTime, op)));
         }
 
+        interceptor.stopBatch();
         return result;
     }
 
-    public List<String> performActionAsync(List<String> actions, List<String> params){
+//    @Override
+    public List<String> performActionAsync(List<String> actions, List<String> params) {
+        interceptor.startBatch();
+
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
             var futures = actions.stream()
                     .map(action -> {
                         var sleepTime = Duration.ofSeconds(RandomGenerator.getDefault().nextInt(3, 10));
-                        return CompletableFuture.supplyAsync(() -> {
-                            if (randBoolean25vs75()) {
-                                return executeAction(action,
-                                        params.get(RandomGenerator.getDefault().nextInt(params.size())),
-                                        sleepTime,
-                                        this::successfulActionWithRandomSleep);
-                            } else {
-                                return executeAction(action,
-                                        params.get(RandomGenerator.getDefault().nextInt(params.size())),
-                                        sleepTime,
-                                        this::randomFailAction);
-                            }
-                        }, executor);
+                        var param = params.get(RandomGenerator.getDefault().nextInt(params.size()));
+                        boolean success = randBoolean25vs75();
+                        ActionOperator op = success
+                                ? this::successfulActionWithRandomSleep
+                                : this::randomFailAction;
+                        String actionType = success ? "successfulActionWithRandomSleep" : "randomFailAction";
+
+                        return CompletableFuture.supplyAsync(
+                                () -> interceptor.recordLatency(actionType, () -> executeAction(action, param, sleepTime, op)),
+                                executor);
                     })
                     .toList();
 
-            return futures.stream()
+            var results = futures.stream()
                     .map(CompletableFuture::join)
                     .collect(Collectors.toList());
+
+            interceptor.stopBatch();
+            return results;
         }
+    }
+
+    public LatencyMetrics getMetrics() {
+        return interceptor.getMetrics();
     }
 
     private static boolean randBoolean25vs75() {
@@ -65,7 +78,7 @@ public class ActionAdapter implements ActionAdapterPort {
                 || RandomGenerator.getDefault().nextBoolean();
     }
 
-    private String executeAction(String action, String response, Duration sleepTimeOfSeconds, ActionOperator op){
+    private String executeAction(String action, String response, Duration sleepTimeOfSeconds, ActionOperator op) {
         return op.apply(action, response, sleepTimeOfSeconds);
     }
 
@@ -73,7 +86,6 @@ public class ActionAdapter implements ActionAdapterPort {
         IO.println("START: -" + action + "- SLEEP TIME: " + sleepTimeOfSeconds);
         executeSleep(sleepTimeOfSeconds);
         IO.println("END: -" + action + "- RETURNING: " + response);
-
         return action + "-" + response;
     }
 
