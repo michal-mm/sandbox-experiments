@@ -8,12 +8,8 @@ import java.util.concurrent.Executors;
 import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 
-public class ActionAdapter {
 
-    @FunctionalInterface
-    public interface ActionOperator {
-        String apply(String action, String response, Duration sleepTime);
-    }
+public class ActionAdapter implements ActionAdapterPort {
 
 
     public List<String> performAction(List<String> actions, List<String> params){
