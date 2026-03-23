@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 
-public class ActionAdapter /*implements ActionAdapterPort */{
+public class ActionAdapter {
 
     private final LatencyInterceptor interceptor;
 
@@ -20,7 +20,6 @@ public class ActionAdapter /*implements ActionAdapterPort */{
         this.interceptor = interceptor;
     }
 
-//    @Override
     public List<String> performAction(List<String> actions, List<String> params) {
         var result = new ArrayList<String>();
         interceptor.startBatch();
@@ -39,7 +38,6 @@ public class ActionAdapter /*implements ActionAdapterPort */{
         return result;
     }
 
-//    @Override
     public List<String> performActionAsync(List<String> actions, List<String> params) {
         interceptor.startBatch();
 
